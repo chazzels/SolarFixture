@@ -14,14 +14,14 @@ class SolarFixture {
 	private controller: any;
 	private client: any;
 	
-	constructor() {
+	constructor(option: any) {
 		
 		console.log(this.version());
 		console.group();
 		
 		this.controller = new this.FixutreController();
 		
-		this.client = new this.FixtureClient();
+		this.client = new this.FixtureClient(option.serverAdress);
 		
 		console.groupEnd();
 		console.log("------------------------------");

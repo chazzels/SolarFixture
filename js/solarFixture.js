@@ -1,6 +1,6 @@
 "use strict";
 class SolarFixture {
-    constructor() {
+    constructor(option) {
         this.majorVersion = 0;
         this.minorversion = 0;
         this.revisionVersion = 1;
@@ -10,7 +10,7 @@ class SolarFixture {
         console.log(this.version());
         console.group();
         this.controller = new this.FixutreController();
-        this.client = new this.FixtureClient();
+        this.client = new this.FixtureClient(option.serverAdress);
         console.groupEnd();
         console.log("------------------------------");
     }
