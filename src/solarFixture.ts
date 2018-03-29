@@ -7,23 +7,25 @@ class SolarFixture {
 	readonly releaseType: string = "a";
 	
 	/* imported modules */
-	private FixutreController: any = require("./fixture.controller/controller");
 	private FixtureClient: any = require("./fixture.client/client");
+	private FixutreController: any = require("./fixture.controller/controller");
 	
 	/* module variables */
-	private controller: any;
 	private client: any;
+	private controller: any;
 	
 	constructor(option: any) {
 		
 		console.log(this.version());
-		console.group();
 		
-		this.controller = new this.FixutreController();
+		console.group();
 		
 		this.client = new this.FixtureClient(option.serverAdress);
 		
+		this.controller = new this.FixutreController();
+		
 		console.groupEnd();
+		
 		console.log("------------------------------");
 		
 	}

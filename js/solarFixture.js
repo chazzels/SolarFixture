@@ -5,12 +5,12 @@ class SolarFixture {
         this.minorversion = 0;
         this.revisionVersion = 1;
         this.releaseType = "a";
-        this.FixutreController = require("./fixture.controller/controller");
         this.FixtureClient = require("./fixture.client/client");
+        this.FixutreController = require("./fixture.controller/controller");
         console.log(this.version());
         console.group();
-        this.controller = new this.FixutreController();
         this.client = new this.FixtureClient(option.serverAdress);
+        this.controller = new this.FixutreController();
         console.groupEnd();
         console.log("------------------------------");
     }
