@@ -1,16 +1,23 @@
 /*
 *	module for connecting to a websocket server.
-*	
 */
 
 class WebSocketClient {
 	
+	/* websocket variables */
 	private WebSocket: any = require("ws");
 	private ws: any;
+	
+	/* option variables */
 	private serverAddress: string = "ws://127.0.0.1:80/";
+	
+	/* status variables */
 	private connected: boolean = false;
 	private attempting: boolean = false;
 	private timerActive: boolean = false;
+	
+	/* constant variables */
+	private readonly RECONNECT_WAIT: number = 2500;
 	
 	constructor(targetAddress: string) {
 		
@@ -21,22 +28,22 @@ class WebSocketClient {
 		/* set target address passed into the constructor. */
 		if(targetAddress !== undefined && targetAddress !== null) {
 			
-			this.serverAddress = targetAddress;
+			that.serverAddress = targetAddress;
 			
 		}
 		
-		this.attemptConnection();
+		that.attemptConnection(that);
 		
 	}
 	
 	/*  */
-	private startMonitor(that) {
+	private startMonitor(that: any) {
 		
 		if(that.timerActive === false) { 
 			
 			console.log("SOCKET_CLIENT::MONITOR_STARTING");
 			
-			this.statusMonitorTimer(that);
+			that.statusMonitorTimer(that);
 			
 			that.timerActive = true;
 			
@@ -49,7 +56,7 @@ class WebSocketClient {
 	}
 	
 	/* repeated timeout to continually monitor connection status. */
-	private statusMonitorTimer(that) {
+	private statusMonitorTimer(that: any) {
 		
 		setTimeout(function monitorTick() {
 			
@@ -64,23 +71,16 @@ class WebSocketClient {
 	/* loop that checks connection status and attempts to reconnect.  */
 	private statusMonitor(that) {
 		
-		if(this.connected === false && this.attempting === false) {
+		if(that.connected === false && that.attempting === false) {
 			
-			this.attemptConnection();
-			
-		} else if(this.connected === true && this.attempting === false) {
-			
-			//console.log("SOCKET_CLIENT::MONITOR_CHECK: PASS");
+			that.attemptConnection(that);
 			
 		}
 		
 	}
 	
 	/* attempt to connect to a websocket server. */
-	private attemptConnection() {
-		
-		// set variables
-		let that = this;
+	private attemptConnection(that: any) {
 		
 		let address = that.serverAddress.toString();
 		
@@ -91,15 +91,31 @@ class WebSocketClient {
 			
 			console.log("SOCKET_CLIENT::CONNECTING", address);
 			
-			this.ws = new that.WebSocket(address);
+			that.ws = new that.WebSocket(address);
 			
-			this.ws.on('open', function socketOpen() {
+			that.wsOpen(that.ws, that);
+			
+			that.wsClose(that.ws, that);
+			
+			that.wsError(that.ws, that);
+		
+		} else {
+			
+			console.log("SOCKET_CLIENT::CONNECTION_ACTIVE:", "nothing changed");
+			
+		}
+		
+	}
+	
+	private wsOpen(ws: any, that: any) {
+		
+		ws.on('open', function socketOpen() {
 				
 				that.attempting = false;
 				
 				that.connected = true;
 				
-				if(that.timerActive === false) {
+				if(this.timerActive === false) {
 					
 					that.startMonitor(that);
 					
@@ -109,7 +125,11 @@ class WebSocketClient {
 				
 			});
 			
-			this.ws.on("close", function socketClose(code: any, reason: any) {
+	}
+	
+	private wsClose(ws: any, that: any) {
+		
+		ws.on("close", function socketClose(code: any, reason: any) {
 				
 				console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
 				
@@ -125,37 +145,44 @@ class WebSocketClient {
 				
 			});
 			
-			this.ws.on("error", function socketError(error: any) {
-				
-				// set human readable error message.
-				let message = "default";
-				
-				if(error.code === "ECONNREFUSED") {
-					
-					message = "connection refused!";
-					
-				}
-				
-				// set flags and start monitor if not running.
-				that.attempting = false;
-				
-				that.connected = false;
-				
-				if(that.timerActive === false) {
-					
-					that.startMonitor(that);
-					
-				}
-				
-				console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
-				
-			});
+	}
+	
+	/* Error event handler for the websocket. */
+	/* */
+	private wsError(ws: any, that: any) {
 		
-		} else {
+		// let that = context;
+		
+		ws.on("error", function socketError(error: any) {
 			
-			console.log("SOCKET_CLIENT::CONNECTION_ACTIVE:", "nothing changed");
+			// set human readable error message.
+			let message = "default";
 			
-		}
+			if(error.code === "ECONNREFUSED") {
+				
+				message = "connection refused!";
+				
+			} else {
+				
+				message = error.code;
+				
+			}
+			
+			// set flags and start monitor if not running.
+			that .attempting = false;
+			
+			that.connected = false;
+			
+			if(that.timerActive === false) {
+				
+				that.startMonitor(that);
+				
+			}
+			
+			/* log the error recieved */
+			console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
+			
+		});
 		
 	}
 	

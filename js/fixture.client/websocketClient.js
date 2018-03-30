@@ -9,14 +9,14 @@ class WebSocketClient {
         let that = this;
         console.log("SOCKET_CLIENT::STARTING");
         if (targetAddress !== undefined && targetAddress !== null) {
-            this.serverAddress = targetAddress;
+            that.serverAddress = targetAddress;
         }
-        this.attemptConnection();
+        that.attemptConnection(that);
     }
     startMonitor(that) {
         if (that.timerActive === false) {
             console.log("SOCKET_CLIENT::MONITOR_STARTING");
-            this.statusMonitorTimer(that);
+            that.statusMonitorTimer(that);
             that.timerActive = true;
         }
         else {
@@ -30,51 +30,60 @@ class WebSocketClient {
         }, 5000, that);
     }
     statusMonitor(that) {
-        if (this.connected === false && this.attempting === false) {
-            this.attemptConnection();
-        }
-        else if (this.connected === true && this.attempting === false) {
+        if (that.connected === false && that.attempting === false) {
+            that.attemptConnection(that);
         }
     }
-    attemptConnection() {
-        let that = this;
+    attemptConnection(that) {
         let address = that.serverAddress.toString();
         that.attempting = true;
         if (that.connected === false) {
             console.log("SOCKET_CLIENT::CONNECTING", address);
-            this.ws = new that.WebSocket(address);
-            this.ws.on('open', function socketOpen() {
-                that.attempting = false;
-                that.connected = true;
-                if (that.timerActive === false) {
-                    that.startMonitor(that);
-                }
-                console.log("SOCKET_CLIENT::CONNECTED");
-            });
-            this.ws.on("error", function socketError(error) {
-                let message = "default";
-                if (error.code === "ECONNREFUSED") {
-                    message = "connection refused!";
-                }
-                that.attempting = false;
-                that.connected = false;
-                if (that.timerActive === false) {
-                    that.startMonitor(that);
-                }
-                console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
-            });
-            this.ws.on("close", function socketClose(code, reason) {
-                console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
-                that.attempting = false;
-                that.connected = false;
-                if (that.timerActive === false) {
-                    that.startMonitor(that);
-                }
-            });
+            that.ws = new that.WebSocket(address);
+            that.wsOpen(that.ws, that);
+            that.wsClose(that.ws, that);
+            that.wsError(that.ws, that);
         }
         else {
             console.log("SOCKET_CLIENT::CONNECTION_ACTIVE:", "nothing changed");
         }
+    }
+    wsOpen(ws, that) {
+        ws.on('open', function socketOpen() {
+            that.attempting = false;
+            that.connected = true;
+            if (this.timerActive === false) {
+                that.startMonitor(that);
+            }
+            console.log("SOCKET_CLIENT::CONNECTED");
+        });
+    }
+    wsClose(ws, that) {
+        ws.on("close", function socketClose(code, reason) {
+            console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
+            that.attempting = false;
+            that.connected = false;
+            if (that.timerActive === false) {
+                that.startMonitor(that);
+            }
+        });
+    }
+    wsError(ws, that) {
+        ws.on("error", function socketError(error) {
+            let message = "default";
+            if (error.code === "ECONNREFUSED") {
+                message = "connection refused!";
+            }
+            else {
+                message = error.code;
+            }
+            that.attempting = false;
+            that.connected = false;
+            if (that.timerActive === false) {
+                that.startMonitor(that);
+            }
+            console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
+        });
     }
 }
 module.exports = WebSocketClient;
