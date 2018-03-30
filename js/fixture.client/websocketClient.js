@@ -6,6 +6,7 @@ class WebSocketClient {
         this.connected = false;
         this.attempting = false;
         this.timerActive = false;
+        this.RECONNECT_WAIT = 2500;
         let that = this;
         console.log("SOCKET_CLIENT::STARTING");
         if (targetAddress !== undefined && targetAddress !== null) {
