@@ -25,7 +25,7 @@ class WebSocketClient {
 		
 		console.log("SOCKET_CLIENT::STARTING");
 		
-		/* set target address passed into the constructor. */
+		// set target address passed into the constructor.
 		if(targetAddress !== undefined && targetAddress !== null) {
 			
 			that.serverAddress = targetAddress;
@@ -36,7 +36,7 @@ class WebSocketClient {
 		
 	}
 	
-	/*  */
+	/* start the connection monitor  */
 	private startMonitor(that: any) {
 		
 		if(that.timerActive === false) { 
@@ -79,7 +79,7 @@ class WebSocketClient {
 		
 	}
 	
-	/* attempt to connect to a websocket server. */
+	/* attempt to establish a connection to a websocket server. */
 	private attemptConnection(that: any) {
 		
 		let address = that.serverAddress.toString();
@@ -107,14 +107,17 @@ class WebSocketClient {
 		
 	}
 	
+	/* connection opened event handler for the websocket. */
 	private wsOpen(ws: any, that: any) {
 		
 		ws.on('open', function socketOpen() {
 				
+				// set status flags.
 				that.attempting = false;
 				
 				that.connected = true;
 				
+				// start monitor if not already active.
 				if(this.timerActive === false) {
 					
 					that.startMonitor(that);
@@ -127,16 +130,19 @@ class WebSocketClient {
 			
 	}
 	
+	/* Close event handler for the websocket. */
 	private wsClose(ws: any, that: any) {
 		
 		ws.on("close", function socketClose(code: any, reason: any) {
 				
 				console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
 				
+				// set status flags.
 				that.attempting = false;
 				
 				that.connected = false;
 				
+				// start monitor if not already active.
 				if(that.timerActive === false) {
 					
 					that.startMonitor(that);
@@ -148,10 +154,7 @@ class WebSocketClient {
 	}
 	
 	/* Error event handler for the websocket. */
-	/* */
 	private wsError(ws: any, that: any) {
-		
-		// let that = context;
 		
 		ws.on("error", function socketError(error: any) {
 			
@@ -168,18 +171,19 @@ class WebSocketClient {
 				
 			}
 			
-			// set flags and start monitor if not running.
-			that .attempting = false;
+			// set status flags.
+			that.attempting = false;
 			
 			that.connected = false;
 			
+			// start monitor if not already active.
 			if(that.timerActive === false) {
 				
 				that.startMonitor(that);
 				
 			}
 			
-			/* log the error recieved */
+			// log the error recieved.
 			console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
 			
 		});
