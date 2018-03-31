@@ -1,6 +1,6 @@
 "use strict";
 class SolarFixture {
-    constructor(option) {
+    constructor(option, callback) {
         this.majorVersion = 0;
         this.minorversion = 0;
         this.revisionVersion = 1;

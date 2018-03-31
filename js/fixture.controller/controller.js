@@ -22,7 +22,6 @@ class FixtureController {
         }
     }
     driverStart(that) {
-        console.log("*");
         that.driver = new that.driverClass();
     }
 }

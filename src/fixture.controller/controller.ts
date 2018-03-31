@@ -44,9 +44,6 @@ class FixtureController {
 	
 	private driverStart(that: any) {
 		
-		console.log("*");
-		
-		
 		that.driver = new that.driverClass();
 		
 	}

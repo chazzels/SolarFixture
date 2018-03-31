@@ -14,7 +14,7 @@ class SolarFixture {
 	private client: any;
 	private controller: any;
 	
-	constructor(option: any) {
+	constructor(option: any, callback?: any) {
 		
 		console.log(this.version());
 		
