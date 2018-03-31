@@ -6,12 +6,12 @@ class FixtureClient {
 	/* module variables */
 	private client: any;
 	
-	constructor(serverAdress: string) {
+	constructor(option: any) {
 		
 		console.log("FIXTURE_CLIENT::STARTING");
 		console.group();
 		
-		this.client = new this.WebSocketClient(serverAdress);
+		this.client = new this.WebSocketClient(option.serverAdress);
 		
 		console.groupEnd();
 		

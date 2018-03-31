@@ -9,8 +9,8 @@ class SolarFixture {
         this.FixutreController = require("./fixture.controller/controller");
         console.log(this.version());
         console.group();
-        this.client = new this.FixtureClient(option.serverAdress);
-        this.controller = new this.FixutreController();
+        this.client = new this.FixtureClient(option.client);
+        this.controller = new this.FixutreController(option.controller);
         console.groupEnd();
         console.log("------------------------------");
     }

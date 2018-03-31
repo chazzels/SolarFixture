@@ -1,10 +1,10 @@
 "use strict";
 class FixtureClient {
-    constructor(serverAdress) {
+    constructor(option) {
         this.WebSocketClient = require("./websocketClient");
         console.log("FIXTURE_CLIENT::STARTING");
         console.group();
-        this.client = new this.WebSocketClient(serverAdress);
+        this.client = new this.WebSocketClient(option.serverAdress);
         console.groupEnd();
     }
 }

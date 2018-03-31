@@ -2,5 +2,11 @@
 let SolarFixture = require("./js/solarFixture");
 
 let fixture = new SolarFixture({
-	serverAdress: "ws://0.0.0.0:8420/"
+	client: {
+	    serverAdress: "ws://0.0.0.0:8420/"
+	},
+	controller: {
+	    driverProfile: "pca9685"
+	}
+	
 });

@@ -1,9 +1,29 @@
 "use strict";
 class FixtureController {
-    constructor() {
+    constructor(option) {
         console.log("FIXTURE_CONTROLLER::STARTING");
         console.group();
+        this.driverLoader(option.driverProfile.toString(), this.driverStart);
         console.groupEnd();
+    }
+    driverLoader(profileName, callback) {
+        let that = this;
+        let success = false;
+        console.log("FIXTURE_CONTROLLER::LOAD_DRIVER:", profileName);
+        if (profileName.toString() === "pca9685") {
+            this.driverClass = require("./driver-pca9685");
+            success = true;
+        }
+        else {
+            console.log("FIXTURE_CONTROLLER::LOAD_FAIL:", profileName);
+        }
+        if (success) {
+            callback(that);
+        }
+    }
+    driverStart(that) {
+        console.log("*");
+        that.driver = new that.driverClass();
     }
 }
 module.exports = FixtureController;
