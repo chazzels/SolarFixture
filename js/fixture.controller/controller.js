@@ -1,9 +1,13 @@
 "use strict";
 class FixtureController {
     constructor(option) {
+        this.profileName = "default";
         console.log("FIXTURE_CONTROLLER::STARTING");
         console.group();
-        this.driverLoader(option.driverProfile.toString(), this.driverStart);
+        if (option.driver !== undefined || option.driver !== null) {
+            this.profileName = option.driver.toString();
+        }
+        this.driverLoader(this.profileName, this.driverStart);
         console.groupEnd();
     }
     driverLoader(profileName, callback) {
@@ -14,7 +18,7 @@ class FixtureController {
             this.driverClass = require("./driver-pca9685");
             success = true;
         }
-        else if (profileName === "dummy") {
+        else if (profileName === "dummy" || profileName === "default") {
             this.driverClass = require("./driver-dummy");
             success = true;
         }

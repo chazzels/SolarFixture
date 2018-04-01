@@ -2,13 +2,20 @@ class FixtureController {
 	
 	private driverClass: any;
 	private driver: any;
+	private profileName: string = "default";
 	
 	constructor(option: any) {
 		
 		console.log("FIXTURE_CONTROLLER::STARTING");
 		console.group();
 		
-		this.driverLoader(option.driverProfile.toString(), this.driverStart);
+		if(option.driver !== undefined || option.driver !== null) {
+			
+			this.profileName = option.driver.toString();
+			
+		}
+		
+		this.driverLoader(this.profileName, this.driverStart);
 		
 		console.groupEnd();
 		
@@ -28,7 +35,7 @@ class FixtureController {
 			
 			success = true;
 			
-		} else if(profileName === "dummy") {
+		} else if(profileName === "dummy" || profileName === "default") {
 			
 			this.driverClass = require("./driver-dummy");
 			
