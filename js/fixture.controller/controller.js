@@ -10,8 +10,12 @@ class FixtureController {
         let that = this;
         let success = false;
         console.log("FIXTURE_CONTROLLER::LOAD_DRIVER:", profileName);
-        if (profileName.toString() === "pca9685") {
+        if (profileName === "pca9685") {
             this.driverClass = require("./driver-pca9685");
+            success = true;
+        }
+        else if (profileName === "dummy") {
+            this.driverClass = require("./driver-dummy");
             success = true;
         }
         else {
