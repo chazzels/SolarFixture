@@ -17,20 +17,20 @@ class WebSocketClient {
     startMonitor(that) {
         if (that.timerActive === false) {
             console.log("SOCKET_CLIENT::MONITOR_STARTING");
-            that.statusMonitorTimer(that);
+            that.connectionMonitorTimer(that);
             that.timerActive = true;
         }
         else {
             console.log("SOCKET_CLIENT::MONITOR_RUNNING");
         }
     }
-    statusMonitorTimer(that) {
+    connectionMonitorTimer(that) {
         setTimeout(function monitorTick() {
-            that.statusMonitor(that);
-            that.statusMonitorTimer(that);
+            that.connectionMonitor(that);
+            that.connectionMonitorTimer(that);
         }, 5000, that);
     }
-    statusMonitor(that) {
+    connectionMonitor(that) {
         if (that.connected === false && that.attempting === false) {
             that.attemptConnection(that);
         }

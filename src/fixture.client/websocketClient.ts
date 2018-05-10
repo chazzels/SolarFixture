@@ -43,7 +43,7 @@ class WebSocketClient {
 			
 			console.log("SOCKET_CLIENT::MONITOR_STARTING");
 			
-			that.statusMonitorTimer(that);
+			that.connectionMonitorTimer(that);
 			
 			that.timerActive = true;
 			
@@ -56,20 +56,20 @@ class WebSocketClient {
 	}
 	
 	/* repeated timeout to continually monitor connection status. */
-	private statusMonitorTimer(that: any) {
+	private connectionMonitorTimer(that: any) {
 		
 		setTimeout(function monitorTick() {
 			
-			that.statusMonitor(that);
+			that.connectionMonitor(that);
 			
-			that.statusMonitorTimer(that);
+			that.connectionMonitorTimer(that);
 			
 		}, 5000, that);
 		
 	}
 	
 	/* loop that checks connection status and attempts to reconnect.  */
-	private statusMonitor(that) {
+	private connectionMonitor(that) {
 		
 		if(that.connected === false && that.attempting === false) {
 			
