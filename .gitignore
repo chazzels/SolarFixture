@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+#removing the build folder so that only source files are tracked.
+js/
