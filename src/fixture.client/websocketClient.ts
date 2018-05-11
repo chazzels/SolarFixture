@@ -40,8 +40,6 @@ class WebSocketClient {
 	/* start the connection monitor */
 	private startMonitor(that: any) {
 		
-		var foo = 10000;
-		
 		if(that.timerActive === false) { 
 			
 			console.log("SOCKET_CLIENT::MONITOR_STARTING");
