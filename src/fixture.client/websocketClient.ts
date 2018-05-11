@@ -1,5 +1,6 @@
 /*
 *	module for connecting to a websocket server.
+*	TODO: remove as many references to that as possible.
 */
 
 class WebSocketClient {
@@ -36,7 +37,7 @@ class WebSocketClient {
 		
 	}
 	
-	/* start the connection monitor  */
+	/* start the connection monitor */
 	private startMonitor(that: any) {
 		
 		if(that.timerActive === false) { 
@@ -55,7 +56,7 @@ class WebSocketClient {
 		
 	}
 	
-	/* repeated timeout to continually monitor connection status. */
+	/** repeated timeout to continually monitor connection status. */
 	private connectionMonitorTimer(that: any) {
 		
 		setTimeout(function monitorTick() {
@@ -68,8 +69,9 @@ class WebSocketClient {
 		
 	}
 	
-	/* loop that checks connection status and attempts to reconnect.  */
-	private connectionMonitor(that) {
+	/* loop that checks connection status and attempts to reconnect. */
+	/* checks the connection connected and attempting flag. */
+	private connectionMonitor(that: any) {
 		
 		if(that.connected === false && that.attempting === false) {
 			
