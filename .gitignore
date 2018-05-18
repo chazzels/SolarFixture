@@ -1,3 +1,6 @@
+# SolarFixture Ignore
+js/
+
 # Logs
 logs
 *.log

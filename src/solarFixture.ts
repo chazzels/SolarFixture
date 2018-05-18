@@ -12,19 +12,23 @@ class SolarFixture {
 	
 	/* module variables */
 	private client: any;
-	private controller: any;
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    private controller: any;
 	
 	constructor(option: any, callback?: any) {
+		
+		let fixtureStartTime = Date.now();
 		
 		console.log(this.version());
 		
 		console.group();
 		
-		this.client = new this.FixtureClient(option.client);
-		
 		this.controller = new this.FixutreController(option.controller);
 		
+		this.client = new this.FixtureClient(option.client);
+		
 		console.groupEnd();
+		
+		console.log("Start Up Time:", Date.now() - fixtureStartTime, "ms");
 		
 		console.log("------------------------------");
 		
