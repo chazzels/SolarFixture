@@ -1,6 +1,7 @@
 /*
 *	module for connecting to a websocket server.
 *	TODO: remove as many references to that as possible.
+*	TODO: add message relay functionality for other  
 */
 
 class WebSocketClient {
@@ -137,7 +138,7 @@ class WebSocketClient {
 		
 		ws.on("close", function socketClose(code: any, reason: any) {
 				
-				console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
+				// console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
 				
 				// set status flags.
 				that.attempting = false;
