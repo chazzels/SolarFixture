@@ -9,9 +9,14 @@ class FixtureController {
 		console.log("FIXTURE_CONTROLLER::STARTING");
 		console.group();
 		
-		if(option.driver !== undefined || option.driver !== null) {
+		if(option !== undefined) {
 			
-			this.profileName = option.driver.toString();
+			if(option.hasOwnProperty('driver') &&
+				option.driver !== undefined || option.driver !== null) {
+				
+				this.profileName = option.driver.toString();
+				
+			}
 			
 		}
 		
