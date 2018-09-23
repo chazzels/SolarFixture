@@ -92,7 +92,8 @@ class WebSocketClient {
 		
 		if(that.connected === false) {
 			
-			console.log("SOCKET_CLIENT::CONNECTING", address);
+			console.log("SOCKET_CLIENT::CONNECTING", address,
+				new Date().toISOString());
 			
 			that.ws = new that.WebSocket(address);
 			
@@ -127,7 +128,7 @@ class WebSocketClient {
 					
 				}
 				
-				console.log("SOCKET_CLIENT::CONNECTED");
+				console.log("SOCKET_CLIENT::CONNECTED", new Date().toISOString());
 				
 			});
 			
@@ -137,8 +138,6 @@ class WebSocketClient {
 	private wsClose(ws: any, that: any) {
 		
 		ws.on("close", function socketClose(code: any, reason: any) {
-				
-				// console.log("SOCKET_CLIENT::CONNECTION_CLOSED:" + code, reason);
 				
 				// set status flags.
 				that.attempting = false;
@@ -187,7 +186,8 @@ class WebSocketClient {
 			}
 			
 			// log the error recieved.
-			console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message);
+			console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message, 
+				new Date().toISOString());
 			
 		});
 		
