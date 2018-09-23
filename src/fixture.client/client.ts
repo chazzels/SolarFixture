@@ -11,7 +11,7 @@ class FixtureClient {
 		console.log("FIXTURE_CLIENT::STARTING");
 		console.group();
 		
-		this.client = new this.WebSocketClient(option.serverAdress);
+		this.client = new this.WebSocketClient(option.serverAddress);
 		
 		console.groupEnd();
 		
