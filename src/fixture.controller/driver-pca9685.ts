@@ -28,7 +28,7 @@ class pca9685Driver {
 		};
 		
 		// start the driver and connect to the i2cbus.
-		this.pwm = new this.Pca9685Driver(settings, function pca9685callback(err) {
+		this.pwm = new this.Pca9685Driver(settings, function pca9685callback(err: any) {
 			
 			if (err) {
 				
