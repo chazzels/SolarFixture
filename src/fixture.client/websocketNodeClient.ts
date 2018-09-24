@@ -99,6 +99,8 @@ class WebSocketNodeClient {
 			
 			that.wsOpen(that.ws, that);
 			
+			that.wsMessage(that.ws, that);
+			
 			that.wsClose(that.ws, that);
 			
 			that.wsError(that.ws, that);
@@ -134,7 +136,18 @@ class WebSocketNodeClient {
 			
 	}
 	
-	/* Close event handler for the websocket. */
+	/* message event handler for the websocket. */
+	private wsMessage(ws: any, that: any) {
+		
+		ws.on('message', function socketMessage(data) {
+			
+			console.log(data);
+			
+		});
+		
+	}
+	
+	/* close event handler for the websocket. */
 	private wsClose(ws: any, that: any) {
 		
 		ws.on("close", function socketClose(code: any, reason: any) {
