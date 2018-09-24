@@ -18,7 +18,11 @@ class SolarFixture {
 		
 		let fixtureStartTime = Date.now();
 		
+		console.log("------------------------------");
+		
 		console.log(this.version());
+		
+		console.log("------------------------------");
 		
 		console.group();
 		
@@ -27,6 +31,8 @@ class SolarFixture {
 		this.client = new this.FixtureClient(option.client);
 		
 		console.groupEnd();
+		
+		console.log("------------------------------");
 		
 		console.log("Start Up Time:", Date.now() - fixtureStartTime, "ms");
 		
