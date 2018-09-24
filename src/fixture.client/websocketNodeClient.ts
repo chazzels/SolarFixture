@@ -4,14 +4,14 @@
 *	TODO: add message relay functionality for other  
 */
 
-class WebSocketClient {
+class WebSocketNodeClient {
 	
 	/* websocket variables */
 	private WebSocket: any = require("ws");
 	private ws: any;
 	
 	/* option variables */
-	private serverAddress: string = "ws://127.0.0.1:80/";
+	private SERVER_ADDRESS: string = "ws://127.0.0.1:80/";
 	
 	/* status variables */
 	private connected: boolean = false;
@@ -30,7 +30,7 @@ class WebSocketClient {
 		// set target address passed into the constructor.
 		if(targetAddress !== undefined && targetAddress !== null) {
 			
-			that.serverAddress = targetAddress;
+			that.SERVER_ADDRESS = targetAddress;
 			
 		}
 		
@@ -85,7 +85,7 @@ class WebSocketClient {
 	/* attempt to establish a connection to a websocket server. */
 	private attemptConnection(that: any) {
 		
-		let address = that.serverAddress.toString();
+		let address = that.SERVER_ADDRESS.toString();
 		
 		// set attempting flag.
 		that.attempting = true;
@@ -195,4 +195,4 @@ class WebSocketClient {
 	
 }
 
-export = WebSocketClient;
+export = WebSocketNodeClient;
