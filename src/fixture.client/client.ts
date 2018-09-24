@@ -7,7 +7,6 @@ class FixtureClient {
 	
 	/* imported modules */
 	private WebSocketNodeClient: any = require("./websocketNodeClient");
-	private WebSocketBrowserClient: any = require("./websocketBrowserClient");
 	
 	/* module variables */
 	private client: any;
