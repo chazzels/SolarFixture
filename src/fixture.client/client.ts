@@ -18,7 +18,15 @@ class FixtureClient {
 		
 		this.client = new this.WebSocketNodeClient(option.serverAddress);
 		
+		this.client.registerMessageListener(this.onMessage);
+		
 		console.groupEnd();
+		
+	}
+	
+	private onMessage(data:any) {
+		
+		console.log(data);
 		
 	}
 	

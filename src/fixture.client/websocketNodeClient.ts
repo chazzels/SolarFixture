@@ -1,7 +1,8 @@
 /*
 *	module for connecting to a websocket server.
 *	TODO: remove as many references to that as possible.
-*	TODO: add message relay functionality for other  
+*	TODO: add message relay functionality for other.
+*	TODO: add unique id (this.deviceId) which is tied to installation or pre-assigned. created unless found.
 */
 
 class WebSocketNodeClient {
@@ -9,7 +10,14 @@ class WebSocketNodeClient {
 	/* websocket variables */
 	private WebSocket: any = require("ws");
 	private ws: any;
+	private connectionActive: boolean = false;
+	private messageCallback: any = null;
 	
+	/* module variables */
+	private fs: any = require('fs');
+	private clientId: string = "1234-5678-90AB";
+	private deviceId: string = "1234-5678-90AB";
+	private test: string;
 	/* option variables */
 	private SERVER_ADDRESS: string = "ws://127.0.0.1:80/";
 	
@@ -34,7 +42,23 @@ class WebSocketNodeClient {
 			
 		}
 		
+		this.deviceId = this.fs.readFileSync('/var/lib/dbus/machine-id', 'utf8').trim();
+		
 		that.attemptConnection(that);
+		
+	}
+	
+	registerMessageListener(callback: any) {
+		
+		if(typeof callback === 'function') {
+			
+			this.messageCallback = callback;
+			
+		} else {
+			
+			console.log("SOCKET_CLIENT::MESSAGE_LISTENER: object passed is not a function.")
+			
+		}
 		
 	}
 	
@@ -93,7 +117,7 @@ class WebSocketNodeClient {
 		if(that.connected === false) {
 			
 			console.log("SOCKET_CLIENT::CONNECTING", address,
-				new Date().toISOString());
+				new Date().toTimeString());
 			
 			that.ws = new that.WebSocket(address);
 			
@@ -130,7 +154,7 @@ class WebSocketNodeClient {
 					
 				}
 				
-				console.log("SOCKET_CLIENT::CONNECTED", new Date().toISOString());
+				console.log("SOCKET_CLIENT::CONNECTED", new Date().toTimeString());
 				
 			});
 			
@@ -141,7 +165,28 @@ class WebSocketNodeClient {
 		
 		ws.on('message', function socketMessage(data) {
 			
-			console.log(data);
+			if(that.connectionActive) {
+			// if the connnection is validated by the server 
+				
+				if(that.messageCallback !== null) {
+				// call back must be set.
+					
+					that.messageCallback(data);
+					
+				}
+				
+			} else {
+			// if the connection has not been validated by the server. 
+				
+				that.clientId = data;
+				
+				ws.send(that.deviceId+","+"RGBW");
+				
+				console.log("SOCKET_CLIENT::DEVICE_ID:", that.deviceId);
+				
+				console.log("SOCKET_CLIENT::CLIENT_ID:", that.clientId);
+				
+			}
 			
 		});
 		
@@ -200,7 +245,7 @@ class WebSocketNodeClient {
 			
 			// log the error recieved.
 			console.log("SOCKET_CLIENT::CONNECTION_ERROR:", message, 
-				new Date().toISOString());
+				new Date().toTimeString());
 			
 		});
 		
