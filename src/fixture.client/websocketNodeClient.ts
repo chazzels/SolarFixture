@@ -1,77 +1,75 @@
 /*
-*	module for connecting to a websocket server.
-*	TODO: remove as many references to that as possible.
-*	TODO: add message relay functionality for other.
-*	TODO: add unique id (this.deviceId) which is tied to installation or pre-assigned. created unless found.
+*	Module for connecting to a websocket server from a nodejs application.
+*	TODO: add message relay functionality for other use cases.
+*	TODO: implement reconnect wait period increase after failed connection to prevent client DDOS.
 */
+
+import * as Events from "events";
+import * as WebSocket from "ws";
 
 class WebSocketNodeClient {
 	
 	/* websocket variables */
-	private WebSocket: any = require("ws");
-	private ws: any;
-	private connectionActive: boolean = false;
-	private messageCallback: any = null;
+	private static ws: any;
+	private static connectionActive: boolean = false;
+	private static messageCallback: any = null;
 	
 	/* module variables */
-	private fs: any = require('fs');
-	private clientId: string = "1234-5678-90AB";
-	private deviceId: string = "1234-5678-90AB";
-	private test: string;
+	private static clientId: string = "1234-5678-90AB";
+	private static RECONNECT_ATTEMPTS: number = 0;
+	
 	/* option variables */
-	private SERVER_ADDRESS: string = "ws://127.0.0.1:80/";
+	private static SERVER_ADDRESS: string = "ws://127.0.0.1:80/";
 	
 	/* status variables */
-	private connected: boolean = false;
-	private attempting: boolean = false;
-	private timerActive: boolean = false;
+	private static connected: boolean = false;
+	private static attempting: boolean = false;
+	private static timerActive: boolean = false;
 	
 	/* constant variables */
-	private readonly RECONNECT_WAIT: number = 2500;
+	private static readonly RECONNECT_WAIT: number = 2000;
 	
 	constructor(targetAddress: string) {
-		
-		let that = this;
 		
 		console.log("SOCKET_CLIENT::STARTING");
 		
 		// set target address passed into the constructor.
 		if(targetAddress !== undefined && targetAddress !== null) {
 			
-			that.SERVER_ADDRESS = targetAddress;
+			WebSocketNodeClient.SERVER_ADDRESS = targetAddress;
 			
 		}
 		
-		this.deviceId = this.fs.readFileSync('/var/lib/dbus/machine-id', 'utf8').trim();
-		
-		that.attemptConnection(that);
+		WebSocketNodeClient.attemptConnection();
 		
 	}
 	
+	// TODO: replace with event emitter. 
 	registerMessageListener(callback: any) {
 		
-		if(typeof callback === 'function') {
+		if(typeof callback === "function") {
 			
-			this.messageCallback = callback;
+			WebSocketNodeClient.messageCallback = callback;
 			
 		} else {
 			
-			console.log("SOCKET_CLIENT::MESSAGE_LISTENER: object passed is not a function.")
+			console.log("SOCKET_CLIENT::MESSAGE_LISTENER:",
+				"object passed is not a function.")
 			
 		}
 		
 	}
 	
 	/* start the connection monitor */
-	private startMonitor(that: any) {
+	private static startMonitor() {
 		
-		if(that.timerActive === false) { 
+		if(WebSocketNodeClient.timerActive === false) { 
 			
 			console.log("SOCKET_CLIENT::MONITOR_STARTING");
 			
-			that.connectionMonitorTimer(that);
+			WebSocketNodeClient.connectionMonitorTimer();
 			
-			that.timerActive = true;
+			WebSocketNodeClient.timerActive = true;
 			
 		} else {
 			
@@ -81,53 +79,56 @@ class WebSocketNodeClient {
 		
 	}
 	
-	/** repeated timeout to continually monitor connection status. */
-	private connectionMonitorTimer(that: any) {
+	/* repeated timeout to continually monitor connection status. */
+	private static connectionMonitorTimer() {
+		
+		let reconnectTimeout: number = WebSocketNodeClient.RECONNECT_WAIT * WebSocketNodeClient.RECONNECT_ATTEMPTS;
 		
 		setTimeout(function monitorTick() {
 			
-			that.connectionMonitor(that);
+			WebSocketNodeClient.connectionMonitor();
 			
-			that.connectionMonitorTimer(that);
+			WebSocketNodeClient.connectionMonitorTimer();
 			
-		}, 5000, that);
+		}, reconnectTimeout);
 		
 	}
 	
 	/* loop that checks connection status and attempts to reconnect. */
 	/* checks the connection connected and attempting flag. */
-	private connectionMonitor(that: any) {
+	private static connectionMonitor() {
 		
-		if(that.connected === false && that.attempting === false) {
+		if(WebSocketNodeClient.connected === false 
+			&& WebSocketNodeClient.attempting === false) {
 			
-			that.attemptConnection(that);
+			WebSocketNodeClient.attemptConnection();
 			
 		}
 		
 	}
 	
 	/* attempt to establish a connection to a websocket server. */
-	private attemptConnection(that: any) {
+	private static attemptConnection() {
 		
-		let address = that.SERVER_ADDRESS.toString();
+		let address = WebSocketNodeClient.SERVER_ADDRESS.toString();
 		
 		// set attempting flag.
-		that.attempting = true;
+		WebSocketNodeClient.attempting = true;
 		
-		if(that.connected === false) {
+		if(WebSocketNodeClient.connected === false) {
 			
-			console.log("SOCKET_CLIENT::CONNECTING", address,
-				new Date().toTimeString());
+			//console.log("SOCKET_CLIENT::CONNECTING", address,
+			//	new Date().toTimeString());
 			
-			that.ws = new that.WebSocket(address);
+			WebSocketNodeClient.ws = new WebSocket(address);
 			
-			that.wsOpen(that.ws, that);
+			WebSocketNodeClient.wsOpen(WebSocketNodeClient.ws);
 			
-			that.wsMessage(that.ws, that);
+			WebSocketNodeClient.wsMessage(WebSocketNodeClient.ws);
 			
-			that.wsClose(that.ws, that);
+			WebSocketNodeClient.wsClose(WebSocketNodeClient.ws);
 			
-			that.wsError(that.ws, that);
+			WebSocketNodeClient.wsError(WebSocketNodeClient.ws);
 		
 		} else {
 			
@@ -135,56 +136,43 @@ class WebSocketNodeClient {
 			
 		}
 		
+		WebSocketNodeClient.RECONNECT_ATTEMPTS++;
+		
 	}
 	
 	/* connection opened event handler for the websocket. */
-	private wsOpen(ws: any, that: any) {
+	private static wsOpen(ws: any) {
 		
 		ws.on('open', function socketOpen() {
 				
 				// set status flags.
-				that.attempting = false;
+				WebSocketNodeClient.attempting = false;
 				
-				that.connected = true;
+				WebSocketNodeClient.connected = true;
 				
 				// start monitor if not already active.
-				if(this.timerActive === false) {
+				if(WebSocketNodeClient.timerActive === false) {
 					
-					that.startMonitor(that);
+					WebSocketNodeClient.startMonitor();
 					
 				}
 				
-				console.log("SOCKET_CLIENT::CONNECTED", new Date().toTimeString());
+				console.log("SOCKET_CLIENT::CONNECTED", 
+					new Date().toTimeString());
 				
 			});
 			
 	}
 	
 	/* message event handler for the websocket. */
-	private wsMessage(ws: any, that: any) {
+	private static wsMessage(ws: any) {
 		
 		ws.on('message', function socketMessage(data) {
 			
-			if(that.connectionActive) {
-			// if the connnection is validated by the server 
+			if(WebSocketNodeClient.messageCallback !== null) {
+			// call back must be set.
 				
-				if(that.messageCallback !== null) {
-				// call back must be set.
-					
-					that.messageCallback(data);
-					
-				}
-				
-			} else {
-			// if the connection has not been validated by the server. 
-				
-				that.clientId = data;
-				
-				ws.send(that.deviceId+","+"RGBW");
-				
-				console.log("SOCKET_CLIENT::DEVICE_ID:", that.deviceId);
-				
-				console.log("SOCKET_CLIENT::CLIENT_ID:", that.clientId);
+				WebSocketNodeClient.messageCallback(data);
 				
 			}
 			
@@ -193,19 +181,19 @@ class WebSocketNodeClient {
 	}
 	
 	/* close event handler for the websocket. */
-	private wsClose(ws: any, that: any) {
+	private static wsClose(ws: any) {
 		
 		ws.on("close", function socketClose(code: any, reason: any) {
 				
 				// set status flags.
-				that.attempting = false;
+				WebSocketNodeClient.attempting = false;
 				
-				that.connected = false;
+				WebSocketNodeClient.connected = false;
 				
 				// start monitor if not already active.
-				if(that.timerActive === false) {
+				if(WebSocketNodeClient.timerActive === false) {
 					
-					that.startMonitor(that);
+					WebSocketNodeClient.startMonitor();
 					
 				}
 				
@@ -214,7 +202,7 @@ class WebSocketNodeClient {
 	}
 	
 	/* Error event handler for the websocket. */
-	private wsError(ws: any, that: any) {
+	private static wsError(ws: any) {
 		
 		ws.on("error", function socketError(error: any) {
 			
@@ -232,14 +220,14 @@ class WebSocketNodeClient {
 			}
 			
 			// set status flags.
-			that.attempting = false;
+			WebSocketNodeClient.attempting = false;
 			
-			that.connected = false;
+			WebSocketNodeClient.connected = false;
 			
 			// start monitor if not already active.
-			if(that.timerActive === false) {
+			if(WebSocketNodeClient.timerActive === false) {
 				
-				that.startMonitor(that);
+				WebSocketNodeClient.startMonitor();
 				
 			}
 			
@@ -253,4 +241,4 @@ class WebSocketNodeClient {
 	
 }
 
-export = WebSocketNodeClient;
+export { WebSocketNodeClient };

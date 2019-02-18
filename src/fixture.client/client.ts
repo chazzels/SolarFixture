@@ -3,28 +3,40 @@
 *	TODO: implement browser / node detection to select which client moddule to use.
 */
 
+import * as fs from 'fs';
+import * as Events from "events";
+
+import { WebSocketNodeClient } from "./websocketNodeClient";
+
 class FixtureClient {
 	
 	/* imported modules */
-	private WebSocketNodeClient: any = require("./websocketNodeClient");
+	private static events: any = new Events();
 	
 	/* module variables */
 	private client: any;
+	private deviceID: string;
 	
 	constructor(option: any) {
 		
 		console.log("FIXTURE_CLIENT::STARTING");
 		console.group();
 		
-		this.client = new this.WebSocketNodeClient(option.serverAddress);
+		this.deviceID = fs.readFileSync("/var/lib/dbus/machine-id","utf8");
 		
-		this.client.registerMessageListener(this.onMessage);
+		this.deviceID = this.deviceID.trim();
+		
+		console.log(this.deviceID);
+		
+		this.client = new WebSocketNodeClient(option.serverAddress);
+		
+		this.client.registerMessageListener(FixtureClient.onMessage);
 		
 		console.groupEnd();
 		
 	}
 	
-	private onMessage(data:any) {
+	private static onMessage(data:any) {
 		
 		console.log(data);
 		

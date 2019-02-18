@@ -24,13 +24,13 @@ class SolarFixture {
 		
 		console.log("------------------------------");
 		
-		console.group();
+		//console.group();
 		
 		this.controller = new this.FixutreController(option.controller);
 		
 		this.client = new this.FixtureClient(option.client);
 		
-		console.groupEnd();
+		//console.groupEnd();
 		
 		console.log("------------------------------");
 		
